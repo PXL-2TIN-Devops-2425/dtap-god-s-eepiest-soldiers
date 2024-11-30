@@ -32,10 +32,10 @@ pipeline {
 	}
     
     	stage("Stopping and deleting all running docker containers"){
-            steps{
-                script{
-                    sh "docker stop $(docker ps -q) || true"
-                    sh "docker rm $(docker ps -q -a) || true"
+    	    steps {
+                script {
+                    sh "docker stop \$(docker ps -q) || true"
+                    sh "docker rm \$(docker ps -q -a) || true"
                 }
             }
         }
