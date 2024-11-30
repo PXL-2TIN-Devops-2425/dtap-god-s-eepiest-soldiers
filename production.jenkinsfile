@@ -16,6 +16,10 @@ pipeline {
     	stage("Debug"){
 	    steps{
 		script {
+		
+                    sh 'echo "Environment Variables:"'
+                    sh 'env'
+                    
                     sh 'echo "Checking Docker status"'
                     sh 'docker info || echo "Docker info failed"'
                     
