@@ -13,7 +13,7 @@ pipeline {
     
     
     stages {
-    	stage("Debug){
+    	stage("Debug"){
 	    steps{
 		script {
                     sh 'echo "Checking Docker status"'
