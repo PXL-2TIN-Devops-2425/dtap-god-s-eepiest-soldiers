@@ -12,12 +12,13 @@ pipeline {
     
     
     stages {
-        stage("Stopping and deleting all running docker containers"){
+    	stage("Stopping and deleting all running docker containers"){
             steps{
                 sh 'docker stop $(docker ps -a -q) || true'
                 sh 'docker rm $(docker ps -a -q) || true'
             }
         }
+        
         stage('deploy prod') {
             steps {
             	script{
@@ -29,6 +30,7 @@ pipeline {
             	}
             }
         }
+        
         stage('start prod'){
             steps{
             	script{
@@ -40,5 +42,6 @@ pipeline {
             	}
             }
         }
+        
     }
 }
