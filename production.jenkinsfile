@@ -2,7 +2,7 @@ pipeline {
     agent any
     
         environment{
-        REMOTE_SERVER = "52.90.22.43"
+        REMOTE_SERVER = "3.87.251.166"
         SSH_CREDENTIALS = "aws-private-key"
     	DOCKER_CREDENTIALS = "dockerhub-creds"
     	IMAGE_NAME = "calculator-final-app-eepy"
