@@ -14,19 +14,22 @@ pipeline {
     
     stages {
     
-    	stage("Stopping and deleting all running docker containers"){
+    	stage("Stopping and Deleting all Running Docker Containers") {
     	    steps {
-                script {
-            	    sshagent([SSH_CREDENTIALS]){
-            	    	sh """
-            	    	    ssh -o StrictHostKeyChecking=no ubuntu@${REMOTE_SERVER} 'docker stop \$(docker ps -q) || true'
-            	    	    ssh -o StrictHostKeyChecking=no ubuntu@${REMOTE_SERVER} 'docker rm \$(docker ps -q -a) || true'
-            	    	"""
-                    }
-                }
-            }
-        }
-        
+        	script {
+            	    sshagent([SSH_CREDENTIALS]) {
+                	sh """
+                    	    echo 'Stopping all running containers...'
+                    	    ssh -o StrictHostKeyChecking=no ubuntu@${REMOTE_SERVER} <<EOF
+                        	docker stop \$(docker ps -q) || echo 'No containers to stop.'
+                        	docker rm \$(docker ps -q -a) || echo 'No containers to remove.'
+                    	    EOF
+                	"""
+            	    }
+        	}
+    	    }
+	}
+	        
         stage('deploy prod') {
             steps {
             	script{
