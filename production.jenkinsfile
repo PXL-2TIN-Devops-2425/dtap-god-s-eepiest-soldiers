@@ -14,7 +14,9 @@ pipeline {
             steps {
             	script{
             	    sshagent([SSH_CREDENTIALS]){
-            	    	ssh ubuntu@${REMOTE_SERVER} 'docker pull ${DOCKER_HUB_REPO}'
+            	    	sh """
+            	    	    ssh ubuntu@${REMOTE_SERVER} 'docker pull ${DOCKER_HUB_REPO}'
+            	    	"""
             	    }
             	}
             }
