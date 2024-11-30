@@ -7,29 +7,25 @@ pipeline {
     	DOCKER_CREDENTIALS = "dockerhub-creds"
     	IMAGE_NAME = "calculator-final-app-eepy"
     	DOCKER_HUB_REPO = "anatolisafonov/${IMAGE_NAME}"
-    	PATH = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin"
     }
     
     
     
     stages {
     
-    	stage("Stopping and Deleting all Running Docker Containers") {
+    	stage("Stopping and deleting all running docker containers"){
     	    steps {
-        	script {
-            	    sshagent([SSH_CREDENTIALS]) {
-                	sh """
-                    	    echo 'Stopping all running containers...'
-                    	    ssh -o StrictHostKeyChecking=no ubuntu@${REMOTE_SERVER} << 'EOF'
-                        	docker stop \$(docker ps -q) || echo 'No containers to stop.'
-                        	docker rm \$(docker ps -q -a) || echo 'No containers to remove.'
-                    	    EOF
-                	"""
-            	    }
-        	}
-    	    }
-	}
-	        
+                script {
+            	    sshagent([SSH_CREDENTIALS]){
+            	    	sh """
+            	    	    ssh -o StrictHostKeyChecking=no ubuntu@${REMOTE_SERVER} 'docker stop \$(docker ps -q) || true'
+            	    	    ssh -o StrictHostKeyChecking=no ubuntu@${REMOTE_SERVER} 'docker rm \$(docker ps -q -a) || true'
+            	    	"""
+                    }
+                }
+            }
+        }
+        
         stage('deploy prod') {
             steps {
             	script{
