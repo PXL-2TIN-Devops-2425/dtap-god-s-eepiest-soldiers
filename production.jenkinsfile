@@ -15,7 +15,7 @@ pipeline {
             	script{
             	    sshagent([SSH_CREDENTIALS]){
             	    	sh """
-            	    	    ssh ubuntu@${REMOTE_SERVER} 'docker pull ${DOCKER_HUB_REPO}'
+            	    	    ssh -o StrictHostKeyChecking=no ubuntu@${REMOTE_SERVER} 'docker pull ${DOCKER_HUB_REPO}'
             	    	"""
             	    }
             	}
