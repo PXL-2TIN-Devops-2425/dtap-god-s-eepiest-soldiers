@@ -12,10 +12,30 @@ pipeline {
     
     
     stages {
+    	stage("Debug){
+	    steps{
+		script {
+                    sh 'echo "Checking Docker status"'
+                    sh 'docker info || echo "Docker info failed"'
+                    
+                    sh 'echo "Checking running containers"'
+                    sh 'docker ps -q || echo "No running containers"'
+                    
+                    sh 'echo "Stopping all containers"'
+                    sh 'docker stop $(docker ps -q) || echo "No running containers to stop"'
+                    
+                    sh 'echo "Removing all containers"'
+                    sh 'docker rm $(docker ps -a -q) || echo "No containers to remove"'
+                }
+	    }
+	}
+    
     	stage("Stopping and deleting all running docker containers"){
             steps{
-                sh 'docker stop $(docker ps -q) || true'
-                sh 'docker rm $(docker ps -q -a) || true'
+            	sh """
+                    docker stop $(docker ps -q) || true
+                    docker rm $(docker ps -q -a) || true
+                """
             }
         }
         
