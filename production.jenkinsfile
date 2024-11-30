@@ -1,9 +1,22 @@
 pipeline {
     agent any
+    
+        environment{
+        REMOTE_SERVER = "52.90.22.43"
+    	DOCKER_CREDENTIALS = "dockerhub-creds"
+    	IMAGE_NAME = "calculator-final-app-eepy"
+    	DOCKER_HUB_REPO = "anatolisafonov/${IMAGE_NAME}"
+    }
+    
     stages {
-        stage('dtap production') {
+        stage('deploy prod') {
             steps {
-                echo "good luck..."
+            	script{
+            	    docker.withRegistry("https://index.docker.io/v1/", DOCKER_CREDENTIALS){
+            	    	def image = docker.image("${DOCKER_HUB_REPO}:latest")
+            	    	image.pull()
+            	    }
+            	}
             }
         }
     }
