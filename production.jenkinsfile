@@ -3,6 +3,7 @@ pipeline {
     
         environment{
         REMOTE_SERVER = "52.90.22.43"
+        SSH_CREDENTIALS = "aws-private-key"
     	DOCKER_CREDENTIALS = "dockerhub-creds"
     	IMAGE_NAME = "calculator-final-app-eepy"
     	DOCKER_HUB_REPO = "anatolisafonov/${IMAGE_NAME}"
@@ -12,9 +13,8 @@ pipeline {
         stage('deploy prod') {
             steps {
             	script{
-            	    docker.withRegistry("https://index.docker.io/v1/", DOCKER_CREDENTIALS){
-            	    	def image = docker.image("${DOCKER_HUB_REPO}:latest")
-            	    	image.pull()
+            	    sshagent([SSH_CREDENTIALS]){
+            	    	ssh ubuntu@${REMOTE_SERVER} 'docker pull ${DOCKER_HUB_REPO}'
             	    }
             	}
             }
