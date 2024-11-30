@@ -20,7 +20,7 @@ pipeline {
             	    sshagent([SSH_CREDENTIALS]) {
                 	sh """
                     	    echo 'Stopping all running containers...'
-                    	    ssh -o StrictHostKeyChecking=no ubuntu@${REMOTE_SERVER} <<EOF
+                    	    ssh -o StrictHostKeyChecking=no ubuntu@${REMOTE_SERVER} << 'EOF'
                         	docker stop \$(docker ps -q) || echo 'No containers to stop.'
                         	docker rm \$(docker ps -q -a) || echo 'No containers to remove.'
                     	    EOF
