@@ -21,5 +21,16 @@ pipeline {
             	}
             }
         }
+        stage('start prod'){
+            steps{
+            	script{
+            	    sshagent([SSH_CREDENTIALS]){
+            	    	sh """
+            	    	    ssh -o StrictHostKeyChecking=no ubuntu@${REMOTE_SERVER} 'docker run -d -p 80:3000 ${DOCKER_HUB_REPO}'
+            	    	"""
+            	    }
+            	}
+            }
+        }
     }
 }
