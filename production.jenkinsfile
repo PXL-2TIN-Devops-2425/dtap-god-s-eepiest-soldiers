@@ -1,10 +1,54 @@
 pipeline {
     agent any
+    
+        environment{
+        REMOTE_SERVER = "3.87.251.166"
+        SSH_CREDENTIALS = "aws-private-key"
+    	DOCKER_CREDENTIALS = "dockerhub-creds"
+    	IMAGE_NAME = "calculator-final-app-eepy"
+    	DOCKER_HUB_REPO = "anatolisafonov/${IMAGE_NAME}"
+    }
+    
+    
+    
     stages {
-        stage('dtap production') {
-            steps {
-                echo "good luck..."
+    
+    	stage("Stopping and deleting all running docker containers"){
+    	    steps {
+                script {
+            	    sshagent([SSH_CREDENTIALS]){
+            	    	sh """
+            	    	    ssh -o StrictHostKeyChecking=no ubuntu@${REMOTE_SERVER} 'docker stop \$(docker ps -q) || true'
+            	    	    ssh -o StrictHostKeyChecking=no ubuntu@${REMOTE_SERVER} 'docker rm \$(docker ps -q -a) || true'
+            	    	"""
+                    }
+                }
             }
         }
+        
+        stage('deploy prod') {
+            steps {
+            	script{
+            	    sshagent([SSH_CREDENTIALS]){
+            	    	sh """
+            	    	    ssh -o StrictHostKeyChecking=no ubuntu@${REMOTE_SERVER} 'docker pull ${DOCKER_HUB_REPO}'
+            	    	"""
+            	    }
+            	}
+            }
+        }
+        
+        stage('start prod'){
+            steps{
+            	script{
+            	    sshagent([SSH_CREDENTIALS]){
+            	    	sh """
+            	    	    ssh -o StrictHostKeyChecking=no ubuntu@${REMOTE_SERVER} 'docker run -d -p 80:3000 ${DOCKER_HUB_REPO}'
+            	    	"""
+            	    }
+            	}
+            }
+        }
+        
     }
 }
