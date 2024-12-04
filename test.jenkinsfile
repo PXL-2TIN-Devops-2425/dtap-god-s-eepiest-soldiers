@@ -1,17 +1,64 @@
 pipeline {
     agent any
+    
+    environment{
+    	IMAGE_NAME = "calculator-final-app-eepy"
+    	IMAGE_TAG = "latest"
+    	DOCKER_HUB_REPO = "anatolisafonov/${IMAGE_NAME}"
+    	DOCKER_CREDENTIALS = "dockerhub-creds"
+    	CUSTOM_IMAGE = ""
+    }
   
     stages {
-        stage ('cleanup'){
+        stage("Stopping and deleting all running docker containers"){
             steps{
-                // TODO
+                sh 'docker stop $(docker ps -a -q) || true'
+                sh 'docker rm $(docker ps -a -q) || true'
             }
         }
-        stage('fetch app code') {
+        stage ("Install dependencies"){
+            steps{
+            	echo "Run npm install with the configured Node.js version"
+            	nodejs("testenvnode"){
+            		sh "npm install"
+            	}
+            }
+        }
+        stage("fetch app code") {
             steps {
-                // Get some code from a GitHub repository
-                git branch: 'main', url: 'https://github.com/PXL-2TIN-DevOps-Resources/calculator-app-finished.git'
+                echo "Get some code from a GitHub repository"
+                git branch: "main", url: "https://github.com/PXL-2TIN-DevOps-Resources/calculator-app-finished.git"
             }
         }
+        stage("Build artifact") {
+            steps{
+                script{
+                    CUSTOM_IMAGE = docker.build("${DOCKER_HUB_REPO}:${IMAGE_TAG}")
+                }
+            }
+        }
+        stage("Push artifact"){
+            steps{
+                script{
+                    docker.withRegistry("https://index.docker.io/v1/", DOCKER_CREDENTIALS){
+                    	CUSTOM_IMAGE.push()
+                    }
+                }
+            }
+        }
+        stage("Deployment"){
+            steps{
+                script{
+                    docker.image("${DOCKER_HUB_REPO}:${IMAGE_TAG}").run("-p 3000:3000")
+                }
+            }
+        }
+    }
+    
+    post{
+    	always{
+    	    echo "Cleaning up after"
+    	    cleanWs()
+    	}
     }
 }
